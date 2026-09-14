@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Διερεύνηση Αντιλήψεων για τη Δίκαιη Μετάβαση στη Δυτική Μακεδονία</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --column-bg: #f1f5f9;
+      --column-border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; min-width: 1200px; }
+    header { max-width: 1400px; margin: 0 auto 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+    h1 { font-size: 1.4rem; color: #1e293b; margin-bottom: 6px; }
+    .stage-indicator { display: flex; gap: 12px; margin-top: 10px; }
+    .stage-pill { padding: 4px 12px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: #e2e8f0; color: var(--muted); }
+    .stage-pill.active { background: var(--primary); color: #fff; }
+
+    .step-container { max-width: 1400px; margin: 0 auto; display: none; }
+    .step-container.active { display: block; }
+
+    /* Step 1: Pre-sort */
+    .presort-box { max-width: 750px; margin: 40px auto; text-align: center; }
+    .presort-card { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 10px; padding: 30px; min-height: 160px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 25px; line-height: 1.6; }
+    .presort-actions { display: flex; justify-content: center; gap: 15px; }
+    .btn { padding: 10px 22px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+    .btn-disagree { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
+    .btn-disagree:hover { background: #fecaca; }
+    .btn-neutral { background: #f1f5f9; color: var(--muted); border: 1px solid var(--border); }
+    .btn-neutral:hover { background: #e2e8f0; }
+    .btn-agree { background: #dcfce7; color: var(--success); border: 1px solid #86efac; }
+    .btn-agree:hover { background: #bbf7d0; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Step 2: Grid */
+    .board-layout { display: flex; flex-direction: column; gap: 15px; }
+    .pile-drawer { display: flex; gap: 15px; background: #e2e8f0; padding: 12px; border-radius: 8px; overflow-x: auto; min-height: 110px; }
+    .drawer-group { flex: 1; min-width: 250px; }
+    .drawer-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .drawer-cards { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .grid-container { display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+    .grid-column { background: var(--column-bg); border-radius: 6px; border: 1px solid var(--column-border); display: flex; flex-direction: column; min-height: 520px; }
+    .col-header { text-align: center; padding: 8px 4px; font-size: 0.8rem; font-weight: 700; border-bottom: 2px solid var(--border); }
+    .col-header.negative { background: #fee2e2; color: #991b1b; }
+    .col-header.neutral { background: #f1f5f9; color: #475569; }
+    .col-header.positive { background: #dcfce7; color: #166534; }
+    .col-capacity { font-size: 0.75rem; font-weight: 500; color: var(--muted); display: block; margin-top: 2px; }
+    .col-capacity.satisfied { color: var(--success); font-weight: 700; }
+
+    .slot-list { flex: 1; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+    .q-card { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; font-size: 0.75rem; cursor: grab; box-shadow: 0 1px 2px rgba(0,0,0,0.05); user-select: none; }
+    .q-card:active { cursor: grabbing; opacity: 0.7; }
+    .q-card-id { font-weight: 800; margin-right: 4px; color: var(--primary); }
+
+    /* Step 3: Post-sort Questionnaire */
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.95rem; }
+    .form-group textarea, .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+    .statement-review { background: #f8fafc; padding: 10px 14px; border-left: 3px solid var(--primary); margin-bottom: 8px; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 id="study-title">Διερεύνηση Αντιλήψεων για τη Δίκαιη Μετάβαση</h1>
+  <div class="stage-indicator">
+    <div class="stage-pill active" id="pill-step1">1. Προ-ταξινόμηση (3 Ομάδες)</div>
+    <div class="stage-pill" id="pill-step2">2. Τοποθέτηση στον Πίνακα (-4 έως +4)</div>
+    <div class="stage-pill" id="pill-step3">3. Αιτιολόγηση & Υποβολή</div>
+  </div>
+</header>
+
+<!-- STEP 1: PRE-SORT -->
+<section id="step1" class="step-container active">
+  <div class="presort-box">
+    <p id="presort-progress" style="font-weight:700; color:var(--muted); margin-bottom:10px;">Δήλωση 1 από 40</p>
+    <div class="presort-card" id="current-statement-text">Φόρτωση δηλώσεων...</div>
+    <div class="presort-actions">
+      <button class="btn btn-disagree" onclick="handlePreSort('disagree')">Διαφωνώ (-)</button>
+      <button class="btn btn-neutral" onclick="handlePreSort('neutral')">Ουδέτερο / Αβέβαιο (0)</button>
+      <button class="btn btn-agree" onclick="handlePreSort('agree')">Συμφωνώ (+)</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 2: GRID SORTING -->
+<section id="step2" class="step-container">
+  <div class="board-layout">
+    <div class="pile-drawer">
+      <div class="drawer-group">
+        <div class="drawer-title">Διαφωνώ (<span id="count-disagree">0</span>)</div>
+        <div class="drawer-cards" id="pile-disagree" ondragover="allowDrop(event)" ondrop="dropToDrawer(event, 'disagree')"></div>
+      </div>
+      <div class="drawer-group">
+        <div class="drawer-title">Ουδέτερο (<span id="count-neutral">0</span>)</div>
+        <div class="drawer-cards" id="pile-neutral" ondragover="allowDrop(event)" ondrop="dropToDrawer(event, 'neutral')"></div>
+      </div>
+      <div class="drawer-group">
+        <div class="drawer-title">Συμφωνώ (<span id="count-agree">0</span>)</div>
+        <div class="drawer-cards" id="pile-agree" ondragover="allowDrop(event)" ondrop="dropToDrawer(event, 'agree')"></div>
+      </div>
+    </div>
+
+    <div class="grid-container" id="grid-columns"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+      <span id="grid-status-text" style="font-weight:600; color:var(--danger);">Τοποθετήστε όλες τις δηλώσεις στα διαθέσιμα κελιά.</span>
+      <button id="btn-to-step3" class="btn btn-primary" disabled onclick="goToStep(3)">Συνέχεια στην Αιτιολόγηση</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3: POST-SORT FORM -->
+<section id="step3" class="step-container">
+  <div style="max-width:800px; margin:0 auto; background:#fff; padding:30px; border-radius:8px; border:1px solid var(--border);">
+    <h2 style="margin-bottom:15px; font-size:1.2rem;">Αιτιολόγηση Ακραίων Τοποθετήσεων & Στοιχεία</h2>
+    
+    <div class="form-group">
+      <label id="lbl-stakeholder">Φορέας / Ιδιότητα:</label>
+      <input type="text" id="ans-stakeholder" placeholder="π.χ. Τοπική Αυτοδιοίκηση, Εργαζόμενος, Επιχειρηματίας, ΜΚΟ, Πολίτης" required>
+    </div>
+
+    <div class="form-group">
+      <label id="lbl-plus4">Δηλώσεις στη στήλη +4 (Απόλυτη Συμφωνία):</label>
+      <div id="review-plus4"></div>
+      <textarea id="ans-plus4" rows="3" placeholder="Εξηγήστε σύντομα τους λόγους απόλυτης συμφωνίας..." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label id="lbl-minus4">Δηλώσεις στη στήλη -4 (Απόλυτη Διαφωνία):</label>
+      <div id="review-minus4"></div>
+      <textarea id="ans-minus4" rows="3" placeholder="Εξηγήστε σύντομα τους λόγους απόλυτης διαφωνίας..." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label id="lbl-missing">Παρατηρήσεις / Παραλείψεις:</label>
+      <textarea id="ans-missing" rows="2" placeholder="Ζητήματα που παραλείφθηκαν από τις δηλώσεις (προαιρετικό)..."></textarea>
+    </div>
+
+    <button id="btn-submit" class="btn btn-primary" style="width:100%; padding:12px;" onclick="submitSurvey()">Ολοκλήρωση & Υποβολή</button>
+  </div>
+</section>
+
+<script>
+  let statements = [];
+  let settings = { grid: [], saveUrl: '' };
+  let preSortIndex = 0;
+  let preSortPiles = { disagree: [], neutral: [], agree: [] };
+  let gridPlacement = {};
+  let participantId = "P_" + Math.random().toString(36).substring(2, 10);
+
+  async function init() {
+    try {
+      const [settingsRes, statementsRes] = await Promise.all([
+        fetch('settings.xml'),
+        fetch('statements.xml')
+      ]);
+
+      const parser = new DOMParser();
+      const settingsDoc = parser.parseFromString(await settingsRes.text(), "application/xml");
+      const statementsDoc = parser.parseFromString(await statementsRes.text(), "application/xml");
+
+      if (settingsDoc.querySelector('parsererror')) {
+        throw new Error("Σφάλμα ανάγνωσης του settings.xml. Ελέγξτε τη μορφοποίηση του αρχείου.");
+      }
+      if (statementsDoc.querySelector('parsererror')) {
+        throw new Error("Σφάλμα ανάγνωσης του statements.xml. Ελέγξτε τη μορφοποίηση του αρχείου.");
+      }
+
+      document.getElementById('study-title').textContent = settingsDoc.querySelector('title').textContent;
+      settings.saveUrl = settingsDoc.querySelector('saveUrl').textContent.trim();
+
+      const columns = settingsDoc.querySelectorAll('grid column');
+      columns.forEach(col => {
+        settings.grid.push({
+          id: col.getAttribute('id'),
+          capacity: parseInt(col.getAttribute('capacity'), 10),
+          label: col.getAttribute('label')
+        });
+      });
+
+      const stmtNodes = statementsDoc.querySelectorAll('statements statement');
+      stmtNodes.forEach(s => {
+        statements.push({ id: s.getAttribute('id'), text: s.textContent.trim() });
+      });
+
+      if (statements.length === 0) {
+        throw new Error("Δεν βρέθηκαν δηλώσεις μέσα στο statements.xml.");
+      }
+
+      renderGridHeaders();
+      renderPreSortCard();
+    } catch (e) {
+      alert("Σφάλμα φόρτωσης: " + e.message);
+    }
+  }
+
+  function renderGridHeaders() {
+    const container = document.getElementById('grid-columns');
+    container.innerHTML = '';
+    settings.grid.forEach(col => {
+      const val = parseInt(col.id, 10);
+      const headerClass = val < 0 ? 'negative' : (val > 0 ? 'positive' : 'neutral');
+      
+      const colEl = document.createElement('div');
+      colEl.className = 'grid-column';
+      colEl.innerHTML = `
+        <div class="col-header ${headerClass}">
+          ${col.label}
+          <span class="col-capacity" id="cap-${col.id}">0 / ${col.capacity}</span>
+        </div>
+        <div class="slot-list" id="col-${col.id}" ondragover="allowDrop(event)" ondrop="dropToCol(event, '${col.id}')"></div>
+      `;
+      container.appendChild(colEl);
+    });
+  }
+
+  function renderPreSortCard() {
+    if (preSortIndex < statements.length) {
+      const s = statements[preSortIndex];
+      document.getElementById('presort-progress').textContent = `Δήλωση ${preSortIndex + 1} από ${statements.length} [${s.id}]`;
+      document.getElementById('current-statement-text').textContent = s.text;
+    } else {
+      goToStep(2);
+      populateDrawers();
+    }
+  }
+
+  function handlePreSort(pile) {
+    const s = statements[preSortIndex];
+    preSortPiles[pile].push(s);
+    preSortIndex++;
+    renderPreSortCard();
+  }
+
+  function populateDrawers() {
+    ['disagree', 'neutral', 'agree'].forEach(p => {
+      const container = document.getElementById(`pile-${p}`);
+      container.innerHTML = '';
+      preSortPiles[p].forEach(s => {
+        container.appendChild(createCardElement(s));
+      });
+      document.getElementById(`count-${p}`).textContent = preSortPiles[p].length;
+    });
+    updateGridStatus();
+  }
+
+  function createCardElement(statement) {
+    const el = document.createElement('div');
+    el.className = 'q-card';
+    el.id = `card-${statement.id}`;
+    el.draggable = true;
+    el.ondragstart = (e) => e.dataTransfer.setData("text/plain", statement.id);
+    el.innerHTML = `<span class="q-card-id">[${statement.id}]</span> ${statement.text}`;
+    return el;
+  }
+
+  function allowDrop(e) { e.preventDefault(); }
+
+  function dropToCol(e, colId) {
+    e.preventDefault();
+    const stmtId = e.dataTransfer.getData("text/plain");
+    const colConfig = settings.grid.find(c => c.id === colId);
+    const currentOccupancy = Object.values(gridPlacement).filter(c => c === colId).length;
+
+    if (currentOccupancy >= colConfig.capacity && gridPlacement[stmtId] !== colId) {
+      alert(`Η στήλη ${colConfig.label} είναι πλήρης (${colConfig.capacity} δηλώσεις).`);
+      return;
+    }
+
+    gridPlacement[stmtId] = colId;
+    const cardEl = document.getElementById(`card-${stmtId}`);
+    document.getElementById(`col-${colId}`).appendChild(cardEl);
+    updateGridStatus();
+  }
+
+  function dropToDrawer(e, pile) {
+    e.preventDefault();
+    const stmtId = e.dataTransfer.getData("text/plain");
+    delete gridPlacement[stmtId];
+    const cardEl = document.getElementById(`card-${stmtId}`);
+    document.getElementById(`pile-${pile}`).appendChild(cardEl);
+    updateGridStatus();
+  }
+
+  function updateGridStatus() {
+    let allColumnsSatisfied = true;
+    settings.grid.forEach(col => {
+      const count = Object.values(gridPlacement).filter(c => c === col.id).length;
+      const capEl = document.getElementById(`cap-${col.id}`);
+      if (capEl) {
+        capEl.textContent = `${count} / ${col.capacity}`;
+        if (count === col.capacity) {
+          capEl.classList.add('satisfied');
+        } else {
+          capEl.classList.remove('satisfied');
+          allColumnsSatisfied = false;
+        }
+      }
+    });
+
+    ['disagree', 'neutral', 'agree'].forEach(p => {
+      const pileEl = document.getElementById(`pile-${p}`);
+      if (pileEl) {
+        document.getElementById(`count-${p}`).textContent = pileEl.querySelectorAll('.q-card').length;
+      }
+    });
+
+    const totalPlaced = Object.keys(gridPlacement).length;
+    const statusText = document.getElementById('grid-status-text');
+    const nextBtn = document.getElementById('btn-to-step3');
+
+    if (statusText && nextBtn) {
+      if (totalPlaced === statements.length && allColumnsSatisfied) {
+        statusText.textContent = "Όλες οι δηλώσεις τοποθετήθηκαν επιτυχώς!";
+        statusText.style.color = "var(--success)";
+        nextBtn.disabled = false;
+      } else {
+        statusText.textContent = `Τοποθετήθηκαν ${totalPlaced} από ${statements.length} δηλώσεις.`;
+        statusText.style.color = "var(--danger)";
+        nextBtn.disabled = true;
+      }
+    }
+  }
+
+  function goToStep(step) {
+    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.stage-pill').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(`step${step}`).classList.add('active');
+    document.getElementById(`pill-step${step}`).classList.add('active');
+
+    if (step === 3) {
+      renderReviewQuotes('4', 'review-plus4');
+      renderReviewQuotes('-4', 'review-minus4');
+    }
+  }
+
+  function renderReviewQuotes(colId, targetElementId) {
+    const container = document.getElementById(targetElementId);
+    container.innerHTML = '';
+    const stmts = Object.entries(gridPlacement)
+      .filter(([_, c]) => c === colId)
+      .map(([id, _]) => statements.find(s => s.id === id));
+    
+    stmts.forEach(s => {
+      const d = document.createElement('div');
+      d.className = 'statement-review';
+      d.innerHTML = `<strong>[${s.id}]</strong> ${s.text}`;
+      container.appendChild(d);
+    });
+  }
+
+  async function submitSurvey() {
+    const stakeholder = document.getElementById('ans-stakeholder').value.trim();
+    const plus4 = document.getElementById('ans-plus4').value.trim();
+    const minus4 = document.getElementById('ans-minus4').value.trim();
+    const missing = document.getElementById('ans-missing').value.trim();
+
+    if (!stakeholder || !plus4 || !minus4) {
+      alert("Παρακαλούμε συμπληρώστε όλα τα απαιτούμενα πεδία.");
+      return;
+    }
+
+    const submitBtn = document.getElementById('btn-submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Αποστολή δεδομένων...";
+
+    const sortScores = {};
+    Object.entries(gridPlacement).forEach(([id, colId]) => {
+      sortScores[id] = parseInt(colId, 10);
+    });
+
+    const payload = {
+      participantId: participantId,
+      sort: sortScores,
+      postSort: {
+        q_stakeholder: stakeholder,
+        q_plus4: plus4,
+        q_minus4: minus4,
+        q_missing: missing
+      }
+    };
+
+    try {
+      await fetch(settings.saveUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+
+      document.getElementById('step3').innerHTML = `
+        <div style="text-align:center; padding:50px 20px;">
+          <h2 style="color:var(--success); margin-bottom:10px;">Η υποβολή ολοκληρώθηκε επιτυχώς!</h2>
+          <p>Σας ευχαριστούμε θερμά για τη συμμετοχή σας στην έρευνα για τη Δυτική Μακεδονία.</p>
+          <p style="color:var(--muted); font-size:0.85rem; margin-top:15px;">ID Συμμετέχοντος: ${participantId}</p>
+        </div>
+      `;
+    } catch (err) {
+      alert("Προέκυψε σφάλμα κατά την υποβολή: " + err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Ολοκλήρωση & Υποβολή";
+    }
+  }
+
+  window.onload = init;
+</script>
+</body>
+</html>

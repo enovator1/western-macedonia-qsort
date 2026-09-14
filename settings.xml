@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <!-- Survey Title and Metadata -->
+  <title>Διερεύνηση Αντιλήψεων για τη Δίκαιη Μετάβαση στη Δυτική Μακεδονία</title>
+  
+  <!-- Endpoint URL for Submissions -->
+  <saveUrl>https://script.google.com/macros/s/AKfycbxj8jU54bYDpL-TEUWG5QbsIbuza37KxzgCj6Bq2qM-L4eo9t9MjlQUoQWzPEthPMdk/exec</saveUrl>
+
+  <!-- Step 1: Pre-sort Piles -->
+  <helpText>Παρακαλούμε διαβάστε προσεκτικά τις 40 δηλώσεις και χωρίστε τις αρχικά σε 3 ομάδες: Διαφωνώ (-), Ουδέτερο / Αβέβαιο (0), Συμφωνώ (+).</helpText>
+  
+  <!-- Step 2: Forced Distribution Grid Configuration (2-3-5-5-10-5-5-3-2 = 40 items) -->
+  <grid>
+    <column id="-4" capacity="2" label="-4 (Διαφωνώ Απόλυτα)" />
+    <column id="-3" capacity="3" label="-3" />
+    <column id="-2" capacity="5" label="-2" />
+    <column id="-1" capacity="5" label="-1" />
+    <column id="0"  capacity="10" label="0 (Ουδέτερο / Αμφίσημο)" />
+    <column id="1"  capacity="5" label="+1" />
+    <column id="2"  capacity="5" label="+2" />
+    <column id="3"  capacity="3" label="+3" />
+    <column id="4"  capacity="2" label="+4 (Συμφωνώ Απόλυτα)" />
+  </grid>
+
+  <!-- Step 3: Qualitative Post-Sort Prompts -->
+  <postSortQuestions>
+    <question id="q_plus4" label="Για ποιους λόγους επιλέξατε να τοποθετήσετε αυτές τις συγκεκριμένες δηλώσεις στη στήλη +4 (απόλυτη συμφωνία);" required="true" />
+    <question id="q_minus4" label="Για ποιους λόγους επιλέξατε να τοποθετήσετε αυτές τις συγκεκριμένες δηλώσεις στη στήλη -4 (απόλυτη διαφωνία);" required="true" />
+    <question id="q_missing" label="Υπάρχει κάποιο σημαντικό ζήτημα σχετικά με τη δίκαιη μετάβαση στη Δυτική Μακεδονία που θεωρείτε ότι παραλείφθηκε από τις δηλώσεις;" required="false" />
+    <question id="q_stakeholder" label="Φορέας / Ιδιότητα (π.χ. Τοπική Αυτοδιοίκηση, Εργαζόμενος/Συνδικάτο, Επιχειρηματίας, ΜΚΟ, Πολίτης):" required="true" />
+  </postSortQuestions>
+</settings>
